@@ -528,4 +528,44 @@ function renderClues() {
 function getCellSize() {
     const width = window.innerWidth;
     if (width < 450) return 30;
-    if (width < 700) return
+    if (width < 700) return 38;
+    return 48;
+}
+
+function updateSizes() {
+    const size = getCellSize();
+    gridContainer.style.gridTemplateColumns = `repeat(${cols}, ${size}px)`;
+    gridContainer.style.gridTemplateRows = `repeat(${rows}, ${size}px)`;
+
+    const cells = gridContainer.querySelectorAll('.cell');
+    cells.forEach(cell => {
+        cell.style.width = size + 'px';
+        cell.style.height = size + 'px';
+    });
+}
+
+// ================================================================
+//  ЗАПУСК
+// ================================================================
+
+document.addEventListener('DOMContentLoaded', () => {
+    renderGrid();
+    renderClues();
+
+    totalSpan.textContent = totalWordsCount;
+    correctSpan.textContent = 0;
+
+    document.getElementById('checkBtn').addEventListener('click', checkAll);
+    document.getElementById('resetBtn').addEventListener('click', resetAll);
+    document.getElementById('hintBtn').addEventListener('click', giveHint);
+
+    window.addEventListener('resize', updateSizes);
+
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.clue-section li') && !e.target.closest('.cell')) {
+            highlightWord(null);
+        }
+    });
+
+    messageDiv.textContent = '🧩 Нажми на вопрос — подсветятся клетки!';
+});
