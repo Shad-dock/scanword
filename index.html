@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>🧩 Сканворд</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🧩 Сканворд</h1>
+            <p class="subtitle">Впиши слова по описаниям</p>
+        </header>
+
+        <!-- Сетка -->
+        <div id="crossword-grid"></div>
+
+        <!-- Подсказки -->
+        <div id="clues-container">
+            <div class="clue-section">
+                <h3>➡ По горизонтали</h3>
+                <ul id="horizontal-clues"></ul>
+            </div>
+            <div class="clue-section">
+                <h3>⬇ По вертикали</h3>
+                <ul id="vertical-clues"></ul>
+            </div>
+        </div>
+
+        <!-- Кнопки -->
+        <div class="buttons">
+            <button id="checkBtn">✅ Проверить всё</button>
+            <button id="resetBtn">🔄 Очистить всё</button>
+            <button id="hintBtn">💡 Подсказка</button>
+        </div>
+
+        <!-- Статус -->
+        <div id="message"></div>
+        <div id="score">
+            🎯 Правильно: <span id="correctCount">0</span> из <span id="totalCount">0</span>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
