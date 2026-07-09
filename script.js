@@ -1,5 +1,7 @@
 // ================================================================
 //  ДАННЫЕ СКАНВОРДА
+//  Сетка: буквы и 0 для чёрных клеток
+//  questions: { "row,col": "Вопрос" } — привязка к координатам
 // ================================================================
 
 const gridData = [
@@ -16,31 +18,34 @@ const gridData = [
     [0, 0, 'Р', 'Ы', 0, 'Ж', 'Ж', 0, 'И', 0]
 ];
 
-// Вопросы для каждой клетки (индекс = номер слова)
-// Вопрос ставится в первую букву слова
+// ================================================================
+//  ВОПРОСЫ ПРИВЯЗАНЫ К КООРДИНАТАМ (ряд, колонка)
+//  где начинается слово
+// ================================================================
+
 const questions = {
-    1: 'Домашний любимец',
-    2: 'Ночная птица',
-    3: 'Согласие',
-    4: 'Огромный с хоботом',
-    5: 'Полосатый хищник',
-    6: 'Длинноухий',
-    7: 'Косолапый',
-    8: 'Полоскун',
-    9: 'Чёрная птица',
-    10: 'Белая болтушка',
-    11: 'Врановые',
-    12: 'Синяя птичка',
-    13: 'Стучит по дереву',
-    14: 'Даёт молоко',
-    15: 'Даёт шерсть',
-    16: 'Даёт сало',
-    17: 'Даёт мясо',
-    18: 'Друг человека',
-    19: 'Маленький серый',
-    20: 'С длинным хвостом',
-    21: 'Колючий',
-    22: 'Хитрая',
+    "0,0": 'Домашний любимец',   // КОТ
+    "0,4": 'Ночная птица',       // СОВ
+    "0,8": 'Согласие',           // МИР
+    "1,0": 'Огромный с хоботом', // СЛОН
+    "2,0": 'Полосатый хищник',   // ТИГР
+    "2,2": 'Длинноухий',         // ЗАЯЦ
+    "2,5": 'Косолапый',          // МЕДВЕДЬ
+    "2,7": 'Полоскун',           // ЕНОТ
+    "4,0": 'Чёрная птица',       // ВОРОН
+    "4,2": 'Белая болтушка',     // СОРОКА
+    "4,4": 'Врановые',           // ГАЛКА
+    "4,7": 'Синяя птичка',       // СИНИЦА
+    "4,9": 'Стучит по дереву',   // ДЯТЕЛ
+    "6,0": 'Даёт молоко',        // КОЗА
+    "6,2": 'Даёт шерсть',        // БАРАН
+    "6,4": 'Даёт сало',          // СВИНЬЯ
+    "6,7": 'Даёт мясо',          // КОРОВА
+    "6,9": 'Друг человека',      // СОБАКА
+    "8,0": 'Маленький серый',    // МЫШЬ
+    "8,2": 'С длинным хвостом',  // КРЫСА
+    "8,5": 'Колючий',            // ЁЖ
+    "8,8": 'Хитрая',             // ЛИС
 };
 
 // ================================================================
@@ -53,7 +58,7 @@ function buildWordsFromGrid(grid) {
     const words = { h: {}, v: {} };
     let wordId = 1;
 
-    // Горизонтальные слова (длиной >= 2)
+    // Горизонтальные слова
     for (let r = 0; r < rows; r++) {
         let c = 0;
         while (c < cols) {
@@ -80,7 +85,7 @@ function buildWordsFromGrid(grid) {
         }
     }
 
-    // Вертикальные слова (длиной >= 2)
+    // Вертикальные слова
     for (let c = 0; c < cols; c++) {
         let r = 0;
         while (r < rows) {
@@ -401,7 +406,7 @@ function renderGrid() {
     gridContainer.style.gridTemplateColumns = `repeat(${cols}, 52px)`;
     gridContainer.style.gridTemplateRows = `repeat(${rows}, 52px)`;
 
-    // Сначала собираем все номера слов для первой буквы
+    // Собираем все стартовые позиции слов
     const wordStarts = {};
     for (const [id, data] of Object.entries(words.h)) {
         const key = `${data.row},${data.col}`;
@@ -426,20 +431,23 @@ function renderGrid() {
             if (letter === 0) {
                 cell.classList.add('black');
             } else {
-                // Номер клетки (если слово начинается здесь)
+                // Проверяем, начинается ли здесь слово
                 const key = `${r},${c}`;
-                if (wordStarts[key]) {
+                const wordId = wordStarts[key];
+
+                if (wordId) {
+                    // Номер слова
                     const numSpan = document.createElement('span');
                     numSpan.className = 'number';
-                    numSpan.textContent = wordStarts[key];
+                    numSpan.textContent = wordId;
                     cell.appendChild(numSpan);
 
-                    // Вопрос
-                    const qText = questions[wordStarts[key]] || '';
-                    if (qText) {
+                    // Вопрос (если есть)
+                    const questionText = questions[key] || '';
+                    if (questionText) {
                         const qSpan = document.createElement('span');
                         qSpan.className = 'question';
-                        qSpan.textContent = qText;
+                        qSpan.textContent = questionText;
                         cell.appendChild(qSpan);
                     }
                 }
@@ -467,7 +475,6 @@ function renderGrid() {
                                 messageDiv.textContent = '🎉 Слово угадано!';
                                 messageDiv.style.color = '#8bff8b';
                             } else {
-                                // Показываем ошибку
                                 for (let i = 0; i < data.length; i++) {
                                     const rr = data.row;
                                     const cc = data.col + i;
@@ -483,7 +490,7 @@ function renderGrid() {
                         }
                     }
 
-                    // Автопереход
+                    // Автопереход на следующую клетку
                     if (val.trim() !== '') {
                         moveToNextCell(r, c);
                     }
@@ -507,7 +514,7 @@ function renderGrid() {
         }
     }
 
-    // Устанавливаем размеры для адаптива
+    // Адаптивные размеры
     updateSizes();
 }
 
@@ -543,5 +550,5 @@ document.addEventListener('DOMContentLoaded', () => {
 
     window.addEventListener('resize', updateSizes);
 
-    messageDiv.textContent = '🧩 Вписывай буквы — слова будут проверяться автоматически!';
+    messageDiv.textContent = '🧩 Вписывай буквы — слова проверяются автоматически!';
 });
