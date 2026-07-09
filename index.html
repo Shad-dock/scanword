@@ -9,16 +9,31 @@
 <body>
     <div class="container">
         <h1>🧩 Сканворд</h1>
-        <p class="subtitle">Введи буквы в клетки. Стрелки показывают направление</p>
+        <p class="subtitle">Впиши буквы в клетки. Ответы на вопросы — внизу</p>
 
+        <!-- Сетка -->
         <div id="crossword-grid"></div>
 
+        <!-- Вопросы -->
+        <div id="clues-container">
+            <div class="clue-section">
+                <h3>➡ По горизонтали</h3>
+                <ul id="horizontal-clues"></ul>
+            </div>
+            <div class="clue-section">
+                <h3>⬇ По вертикали</h3>
+                <ul id="vertical-clues"></ul>
+            </div>
+        </div>
+
+        <!-- Кнопки -->
         <div class="buttons">
             <button id="checkBtn">✅ Проверить</button>
             <button id="resetBtn">🔄 Очистить</button>
             <button id="hintBtn">💡 Подсказка</button>
         </div>
 
+        <!-- Статус -->
         <div id="message"></div>
         <div id="score">🎯 Отгадано: <span id="correctCount">0</span> из <span id="totalCount">0</span></div>
     </div>
