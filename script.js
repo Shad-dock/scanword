@@ -1,33 +1,59 @@
 // ================================================================
 //  ДАННЫЕ СКАНВОРДА
-//  Каждая клетка: { letter: 'А', question: 'Вопрос' }
-//  0 = чёрная клетка
 // ================================================================
 
-const crosswordData = {
-    grid: [
-        //  0   1   2   3   4   5   6   7   8   9
-        [{ letter: 'К', question: 'Домашний любимец' }, { letter: 'О', question: '' }, { letter: 'Т', question: '' }, 0, { letter: 'С', question: 'Ночная птица' }, { letter: 'О', question: '' }, { letter: 'В', question: '' }, 0, { letter: 'М', question: 'Согласие' }, { letter: 'И', question: '' }],
-        [{ letter: 'С', question: 'Огромный с хоботом' }, 0, 0, 0, 0, 0, 0, 0, 0, { letter: 'Р', question: '' }],
-        [{ letter: 'Т', question: 'Полосатый хищник' }, 0, { letter: 'З', question: 'Длинноухий' }, { letter: 'А', question: '' }, 0, { letter: 'М', question: 'Косолапый' }, 0, { letter: 'Е', question: 'Полоскун' }, { letter: 'Н', question: '' }, 0],
-        [0, 0, { letter: 'Я', question: '' }, { letter: 'Ц', question: '' }, 0, { letter: 'Е', question: '' }, 0, { letter: 'О', question: '' }, { letter: 'Т', question: '' }, 0],
-        [{ letter: 'В', question: 'Чёрная птица' }, 0, { letter: 'С', question: 'Белая болтушка' }, 0, { letter: 'Г', question: 'Врановые' }, { letter: 'А', question: '' }, 0, { letter: 'С', question: 'Синяя птичка' }, 0, { letter: 'Д', question: 'Стучит по дереву' }],
-        [0, 0, { letter: 'О', question: '' }, 0, { letter: 'Л', question: '' }, { letter: 'Й', question: '' }, 0, { letter: 'И', question: '' }, 0, { letter: 'Я', question: '' }],
-        [{ letter: 'К', question: 'Даёт молоко' }, 0, { letter: 'Б', question: 'Даёт шерсть' }, 0, { letter: 'С', question: 'Даёт сало' }, { letter: 'В', question: '' }, 0, { letter: 'К', question: 'Даёт мясо' }, 0, { letter: 'С', question: 'Друг человека' }],
-        [0, 0, { letter: 'А', question: '' }, 0, { letter: 'В', question: '' }, { letter: 'И', question: '' }, 0, { letter: 'О', question: '' }, 0, { letter: 'О', question: '' }],
-        [{ letter: 'М', question: 'Маленький серый' }, 0, { letter: 'К', question: 'С длинным хвостом' }, { letter: 'Р', question: '' }, 0, { letter: 'Ё', question: 'Колючий' }, { letter: 'Ж', question: '' }, 0, { letter: 'Л', question: 'Хитрая' }, 0],
-        [0, 0, { letter: 'Р', question: '' }, { letter: 'Ы', question: '' }, 0, { letter: 'Ж', question: '' }, { letter: 'Ж', question: '' }, 0, { letter: 'И', question: '' }, 0]
-    ]
+const gridData = [
+    //  0   1   2   3   4   5   6   7   8   9
+    ['К', 'О', 'Т', 0, 'С', 'О', 'В', 0, 'М', 'И'],
+    ['С', 0, 0, 0, 0, 0, 0, 0, 0, 'Р'],
+    ['Т', 0, 'З', 'А', 0, 'М', 0, 'Е', 'Н', 0],
+    [0, 0, 'Я', 'Ц', 0, 'Е', 0, 'О', 'Т', 0],
+    ['В', 0, 'С', 0, 'Г', 'А', 0, 'С', 0, 'Д'],
+    [0, 0, 'О', 0, 'Л', 'Й', 0, 'И', 0, 'Я'],
+    ['К', 0, 'Б', 0, 'С', 'В', 0, 'К', 0, 'С'],
+    [0, 0, 'А', 0, 'В', 'И', 0, 'О', 0, 'О'],
+    ['М', 0, 'К', 'Р', 0, 'Ё', 'Ж', 0, 'Л', 0],
+    [0, 0, 'Р', 'Ы', 0, 'Ж', 'Ж', 0, 'И', 0]
+];
+
+// Вопросы для каждой клетки (индекс = номер слова)
+// Вопрос ставится в первую букву слова
+const questions = {
+    1: 'Домашний любимец',
+    2: 'Ночная птица',
+    3: 'Согласие',
+    4: 'Огромный с хоботом',
+    5: 'Полосатый хищник',
+    6: 'Длинноухий',
+    7: 'Косолапый',
+    8: 'Полоскун',
+    9: 'Чёрная птица',
+    10: 'Белая болтушка',
+    11: 'Врановые',
+    12: 'Синяя птичка',
+    13: 'Стучит по дереву',
+    14: 'Даёт молоко',
+    15: 'Даёт шерсть',
+    16: 'Даёт сало',
+    17: 'Даёт мясо',
+    18: 'Друг человека',
+    19: 'Маленький серый',
+    20: 'С длинным хвостом',
+    21: 'Колючий',
+    22: 'Хитрая',
 };
 
-// Собираем слова из сетки
+// ================================================================
+//  АВТОМАТИЧЕСКИЙ СБОР СЛОВ ИЗ СЕТКИ
+// ================================================================
+
 function buildWordsFromGrid(grid) {
     const rows = grid.length;
     const cols = grid[0].length;
     const words = { h: {}, v: {} };
     let wordId = 1;
 
-    // Горизонтальные слова
+    // Горизонтальные слова (длиной >= 2)
     for (let r = 0; r < rows; r++) {
         let c = 0;
         while (c < cols) {
@@ -35,10 +61,10 @@ function buildWordsFromGrid(grid) {
                 let start = c;
                 let word = '';
                 while (c < cols && grid[r][c] !== 0) {
-                    word += grid[r][c].letter;
+                    word += grid[r][c];
                     c++;
                 }
-                if (word.length > 1) {
+                if (word.length >= 2) {
                     words.h[wordId] = {
                         row: r,
                         col: start,
@@ -54,7 +80,7 @@ function buildWordsFromGrid(grid) {
         }
     }
 
-    // Вертикальные слова
+    // Вертикальные слова (длиной >= 2)
     for (let c = 0; c < cols; c++) {
         let r = 0;
         while (r < rows) {
@@ -62,10 +88,10 @@ function buildWordsFromGrid(grid) {
                 let start = r;
                 let word = '';
                 while (r < rows && grid[r][c] !== 0) {
-                    word += grid[r][c].letter;
+                    word += grid[r][c];
                     r++;
                 }
-                if (word.length > 1) {
+                if (word.length >= 2) {
                     words.v[wordId] = {
                         row: start,
                         col: c,
@@ -84,8 +110,13 @@ function buildWordsFromGrid(grid) {
     return words;
 }
 
-const grid = crosswordData.grid;
-const words = buildWordsFromGrid(grid);
+// ================================================================
+//  ИНИЦИАЛИЗАЦИЯ
+// ================================================================
+
+const words = buildWordsFromGrid(gridData);
+const rows = gridData.length;
+const cols = gridData[0].length;
 
 const userAnswers = {};
 const solvedWords = new Set();
@@ -99,7 +130,7 @@ let totalWordsCount = Object.keys(words.h).length + Object.keys(words.v).length;
 let correctWordsCount = 0;
 
 // ================================================================
-//  ФУНКЦИИ
+//  ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
 // ================================================================
 
 function getCell(row, col) {
@@ -115,32 +146,29 @@ function getCell(row, col) {
 function getWordForCell(row, col) {
     for (const [id, data] of Object.entries(words.h)) {
         if (data.row === row && data.col <= col && col < data.col + data.length) {
-            return { id, data, dir: 'h' };
+            return { id: parseInt(id), data, dir: 'h' };
         }
     }
     for (const [id, data] of Object.entries(words.v)) {
         if (data.col === col && data.row <= row && row < data.row + data.length) {
-            return { id, data, dir: 'v' };
+            return { id: parseInt(id), data, dir: 'v' };
         }
     }
     return null;
 }
 
-function checkWord(id, data) {
-    let word = '';
+function isWordFullyEntered(id, data) {
     for (let i = 0; i < data.length; i++) {
-        const r = data.row + (data.rowDelta || 0);
-        const c = data.col + (data.colDelta || 0);
-        // Используем row/col напрямую
-        const rr = data.row;
-        const cc = data.col + i;
-        const key = `${rr},${cc}`;
-        word += (userAnswers[key] || '').toUpperCase();
+        const r = data.row;
+        const c = data.col + i;
+        const key = `${r},${c}`;
+        if (!userAnswers[key] || userAnswers[key].trim() === '') {
+            return false;
+        }
     }
-    return word === data.answer;
+    return true;
 }
 
-// Исправленная проверка слова
 function checkWordCorrect(id, data) {
     let word = '';
     for (let i = 0; i < data.length; i++) {
@@ -188,28 +216,58 @@ function unlockWord(id, data) {
     updateScore();
 }
 
-function checkAll() {
-    let anyIncorrect = false;
+function moveToNextCell(row, col) {
+    const nextCol = col + 1;
+    if (nextCol >= cols) return;
+    const nextCell = getCell(row, nextCol);
+    if (nextCell && !nextCell.classList.contains('black')) {
+        const input = nextCell.querySelector('input');
+        if (input && !input.disabled) {
+            input.focus();
+            input.select();
+        } else if (input && input.disabled) {
+            moveToNextCell(row, nextCol);
+        }
+    } else {
+        moveToNextCell(row, nextCol);
+    }
+}
 
+function moveToPrevCell(row, col) {
+    const prevCol = col - 1;
+    if (prevCol < 0) return;
+    const prevCell = getCell(row, prevCol);
+    if (prevCell && !prevCell.classList.contains('black')) {
+        const input = prevCell.querySelector('input');
+        if (input && !input.disabled) {
+            input.focus();
+            input.select();
+        } else if (input && input.disabled) {
+            moveToPrevCell(row, prevCol);
+        }
+    } else {
+        moveToPrevCell(row, prevCol);
+    }
+}
+
+function updateScore() {
+    correctSpan.textContent = correctWordsCount;
+    totalSpan.textContent = totalWordsCount;
+}
+
+// ================================================================
+//  ОСНОВНЫЕ ФУНКЦИИ
+// ================================================================
+
+function checkAll() {
     for (const [id, data] of Object.entries(words.h)) {
-        if (solvedWords.has(parseInt(id))) continue;
-        const isCorrect = checkWordCorrect(id, data);
-        if (isCorrect) {
-            lockWord(parseInt(id), data);
-        } else {
-            // Проверим, есть ли хоть одна буква
-            let hasLetters = false;
-            for (let i = 0; i < data.length; i++) {
-                const r = data.row;
-                const c = data.col + i;
-                const key = `${r},${c}`;
-                if (userAnswers[key] && userAnswers[key].trim() !== '') {
-                    hasLetters = true;
-                    break;
-                }
-            }
-            if (hasLetters) {
-                anyIncorrect = true;
+        const numId = parseInt(id);
+        if (solvedWords.has(numId)) continue;
+        if (isWordFullyEntered(numId, data)) {
+            const isCorrect = checkWordCorrect(numId, data);
+            if (isCorrect) {
+                lockWord(numId, data);
+            } else {
                 for (let i = 0; i < data.length; i++) {
                     const r = data.row;
                     const c = data.col + i;
@@ -226,23 +284,13 @@ function checkAll() {
     }
 
     for (const [id, data] of Object.entries(words.v)) {
-        if (solvedWords.has(parseInt(id))) continue;
-        const isCorrect = checkWordCorrect(id, data);
-        if (isCorrect) {
-            lockWord(parseInt(id), data);
-        } else {
-            let hasLetters = false;
-            for (let i = 0; i < data.length; i++) {
-                const r = data.row + i;
-                const c = data.col;
-                const key = `${r},${c}`;
-                if (userAnswers[key] && userAnswers[key].trim() !== '') {
-                    hasLetters = true;
-                    break;
-                }
-            }
-            if (hasLetters) {
-                anyIncorrect = true;
+        const numId = parseInt(id);
+        if (solvedWords.has(numId)) continue;
+        if (isWordFullyEntered(numId, data)) {
+            const isCorrect = checkWordCorrect(numId, data);
+            if (isCorrect) {
+                lockWord(numId, data);
+            } else {
                 for (let i = 0; i < data.length; i++) {
                     const r = data.row + i;
                     const c = data.col;
@@ -261,24 +309,23 @@ function checkAll() {
     if (correctWordsCount === totalWordsCount) {
         messageDiv.textContent = '🎉 ПОЗДРАВЛЯЮ! Ты разгадал ВСЁ! 🎉';
         messageDiv.style.color = '#8bff8b';
-    } else if (anyIncorrect) {
-        messageDiv.textContent = '🔴 Есть ошибки. Красные клетки — проверь!';
-        messageDiv.style.color = '#ff6b6b';
     } else {
-        messageDiv.textContent = '✅ Всё правильно! Продолжай заполнять!';
-        messageDiv.style.color = '#8bff8b';
+        messageDiv.textContent = `✅ Проверка завершена. Отгадано: ${correctWordsCount} из ${totalWordsCount}`;
+        messageDiv.style.color = '#b0b0ff';
     }
 }
 
 function resetAll() {
     for (const [id, data] of Object.entries(words.h)) {
-        if (solvedWords.has(parseInt(id))) {
-            unlockWord(parseInt(id), data);
+        const numId = parseInt(id);
+        if (solvedWords.has(numId)) {
+            unlockWord(numId, data);
         }
     }
     for (const [id, data] of Object.entries(words.v)) {
-        if (solvedWords.has(parseInt(id))) {
-            unlockWord(parseInt(id), data);
+        const numId = parseInt(id);
+        if (solvedWords.has(numId)) {
+            unlockWord(numId, data);
         }
     }
 
@@ -334,10 +381,8 @@ function giveHint() {
         randomInput.parentElement.classList.add('hint');
         setTimeout(() => randomInput.parentElement.classList.remove('hint'), 1800);
 
-        // Проверяем, не угадано ли всё слово
-        const isComplete = checkWordCorrect(id, data);
-        if (isComplete) {
-            lockWord(parseInt(id), data);
+        if (isWordFullyEntered(id, data) && checkWordCorrect(id, data)) {
+            lockWord(id, data);
             messageDiv.textContent = `💡 Подсказка: буква "${letter}". Слово угадано! 🎉`;
             messageDiv.style.color = '#8bff8b';
         } else {
@@ -347,38 +392,27 @@ function giveHint() {
     }
 }
 
-function moveToNextCell(row, col) {
-    const nextCol = col + 1;
-    if (nextCol >= grid[0].length) return;
-    const nextCell = getCell(row, nextCol);
-    if (nextCell && !nextCell.classList.contains('black')) {
-        const input = nextCell.querySelector('input');
-        if (input && !input.disabled) {
-            input.focus();
-            input.select();
-        } else if (input && input.disabled) {
-            // Если клетка заблокирована, ищем дальше
-            moveToNextCell(row, nextCol);
-        }
-    } else {
-        // Если следующая чёрная, ищем дальше
-        moveToNextCell(row, nextCol);
-    }
-}
-
-function updateScore() {
-    correctSpan.textContent = correctWordsCount;
-    totalSpan.textContent = totalWordsCount;
-}
-
 // ================================================================
-//  РЕНДЕР
+//  РЕНДЕР СЕТКИ
 // ================================================================
 
 function renderGrid() {
     gridContainer.innerHTML = '';
-    const rows = grid.length;
-    const cols = grid[0].length;
+    gridContainer.style.gridTemplateColumns = `repeat(${cols}, 52px)`;
+    gridContainer.style.gridTemplateRows = `repeat(${rows}, 52px)`;
+
+    // Сначала собираем все номера слов для первой буквы
+    const wordStarts = {};
+    for (const [id, data] of Object.entries(words.h)) {
+        const key = `${data.row},${data.col}`;
+        wordStarts[key] = id;
+    }
+    for (const [id, data] of Object.entries(words.v)) {
+        const key = `${data.row},${data.col}`;
+        if (!wordStarts[key]) {
+            wordStarts[key] = id;
+        }
+    }
 
     for (let r = 0; r < rows; r++) {
         for (let c = 0; c < cols; c++) {
@@ -387,44 +421,27 @@ function renderGrid() {
             cell.dataset.row = r;
             cell.dataset.col = c;
 
-            const data = grid[r][c];
+            const letter = gridData[r][c];
 
-            if (data === 0) {
+            if (letter === 0) {
                 cell.classList.add('black');
             } else {
-                // Номер клетки (если это первая буква слова)
-                let isStart = false;
-                let startNum = null;
-                for (const [id, word] of Object.entries(words.h)) {
-                    if (word.row === r && word.col === c) {
-                        isStart = true;
-                        startNum = id;
-                        break;
-                    }
-                }
-                if (!isStart) {
-                    for (const [id, word] of Object.entries(words.v)) {
-                        if (word.row === r && word.col === c) {
-                            isStart = true;
-                            startNum = id;
-                            break;
-                        }
-                    }
-                }
-
-                if (isStart && startNum) {
+                // Номер клетки (если слово начинается здесь)
+                const key = `${r},${c}`;
+                if (wordStarts[key]) {
                     const numSpan = document.createElement('span');
                     numSpan.className = 'number';
-                    numSpan.textContent = startNum;
+                    numSpan.textContent = wordStarts[key];
                     cell.appendChild(numSpan);
-                }
 
-                // Вопрос
-                if (data.question && data.question.trim() !== '') {
-                    const questionSpan = document.createElement('span');
-                    questionSpan.className = 'question';
-                    questionSpan.textContent = data.question;
-                    cell.appendChild(questionSpan);
+                    // Вопрос
+                    const qText = questions[wordStarts[key]] || '';
+                    if (qText) {
+                        const qSpan = document.createElement('span');
+                        qSpan.className = 'question';
+                        qSpan.textContent = qText;
+                        cell.appendChild(qSpan);
+                    }
                 }
 
                 // Поле ввода
@@ -434,23 +451,34 @@ function renderGrid() {
                 input.dataset.row = r;
                 input.dataset.col = c;
 
-                input.addEventListener('input', function () {
+                input.addEventListener('input', function() {
                     const val = this.value.toUpperCase();
                     this.value = val;
                     const key = `${r},${c}`;
                     userAnswers[key] = val;
                     this.parentElement.classList.remove('incorrect');
 
-                    // Проверяем, не угадано ли слово
                     const wordInfo = getWordForCell(r, c);
                     if (wordInfo) {
-                        const { id, data: wordData } = wordInfo;
-                        if (!solvedWords.has(parseInt(id))) {
-                            const isComplete = checkWordCorrect(id, wordData);
-                            if (isComplete) {
-                                lockWord(parseInt(id), wordData);
+                        const { id, data } = wordInfo;
+                        if (!solvedWords.has(id) && isWordFullyEntered(id, data)) {
+                            if (checkWordCorrect(id, data)) {
+                                lockWord(id, data);
                                 messageDiv.textContent = '🎉 Слово угадано!';
                                 messageDiv.style.color = '#8bff8b';
+                            } else {
+                                // Показываем ошибку
+                                for (let i = 0; i < data.length; i++) {
+                                    const rr = data.row;
+                                    const cc = data.col + i;
+                                    const cellEl = getCell(rr, cc);
+                                    if (cellEl) {
+                                        const inp = cellEl.querySelector('input');
+                                        if (inp && !inp.disabled && inp.value.trim() !== '') {
+                                            cellEl.classList.add('incorrect');
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
@@ -461,20 +489,14 @@ function renderGrid() {
                     }
                 });
 
-                input.addEventListener('keydown', function (e) {
+                input.addEventListener('keydown', function(e) {
                     if (e.key === 'Backspace' && this.value === '') {
-                        // Переход на предыдущую клетку
-                        const prevCol = c - 1;
-                        if (prevCol >= 0) {
-                            const prevCell = getCell(r, prevCol);
-                            if (prevCell && !prevCell.classList.contains('black')) {
-                                const prevInput = prevCell.querySelector('input');
-                                if (prevInput && !prevInput.disabled) {
-                                    prevInput.focus();
-                                    prevInput.select();
-                                }
-                            }
-                        }
+                        e.preventDefault();
+                        moveToPrevCell(r, c);
+                    }
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        moveToNextCell(r, c);
                     }
                 });
 
@@ -484,14 +506,34 @@ function renderGrid() {
             gridContainer.appendChild(cell);
         }
     }
+
+    // Устанавливаем размеры для адаптива
+    updateSizes();
+}
+
+function updateSizes() {
+    const width = window.innerWidth;
+    let size = 52;
+    if (width < 450) size = 30;
+    else if (width < 700) size = 38;
+
+    gridContainer.style.gridTemplateColumns = `repeat(${cols}, ${size}px)`;
+    gridContainer.style.gridTemplateRows = `repeat(${rows}, ${size}px)`;
+
+    const cells = gridContainer.querySelectorAll('.cell');
+    cells.forEach(cell => {
+        cell.style.width = size + 'px';
+        cell.style.height = size + 'px';
+    });
 }
 
 // ================================================================
-//  ИНИЦИАЛИЗАЦИЯ
+//  ЗАПУСК
 // ================================================================
 
 document.addEventListener('DOMContentLoaded', () => {
     renderGrid();
+
     totalSpan.textContent = totalWordsCount;
     correctSpan.textContent = 0;
 
@@ -499,5 +541,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('resetBtn').addEventListener('click', resetAll);
     document.getElementById('hintBtn').addEventListener('click', giveHint);
 
-    messageDiv.textContent = '🧩 Вписывай буквы — слова будут угадываться автоматически!';
+    window.addEventListener('resize', updateSizes);
+
+    messageDiv.textContent = '🧩 Вписывай буквы — слова будут проверяться автоматически!';
 });
