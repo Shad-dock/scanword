@@ -1,11 +1,9 @@
 // ================================================================
 //  ДАННЫЕ СКАНВОРДА
-//  Сетка: буквы и 0 для чёрных клеток
-//  questions: { "row,col": "Вопрос" } — привязка к координатам
 // ================================================================
 
+// Сетка: буквы, 0 = чёрная клетка
 const gridData = [
-    //  0   1   2   3   4   5   6   7   8   9
     ['К', 'О', 'Т', 0, 'С', 'О', 'В', 0, 'М', 'И'],
     ['С', 0, 0, 0, 0, 0, 0, 0, 0, 'Р'],
     ['Т', 0, 'З', 'А', 0, 'М', 0, 'Е', 'Н', 0],
@@ -18,38 +16,35 @@ const gridData = [
     [0, 0, 'Р', 'Ы', 0, 'Ж', 'Ж', 0, 'И', 0]
 ];
 
-// ================================================================
-//  ВОПРОСЫ ПРИВЯЗАНЫ К КООРДИНАТАМ (ряд, колонка)
-//  где начинается слово
-// ================================================================
-
+// Вопросы: "row,col" → текст вопроса
+// Важно: вопрос должен быть у первой буквы слова
 const questions = {
-    "0,0": 'Домашний любимец',   // КОТ
-    "0,4": 'Ночная птица',       // СОВ
-    "0,8": 'Согласие',           // МИР
-    "1,0": 'Огромный с хоботом', // СЛОН
-    "2,0": 'Полосатый хищник',   // ТИГР
-    "2,2": 'Длинноухий',         // ЗАЯЦ
-    "2,5": 'Косолапый',          // МЕДВЕДЬ
-    "2,7": 'Полоскун',           // ЕНОТ
-    "4,0": 'Чёрная птица',       // ВОРОН
-    "4,2": 'Белая болтушка',     // СОРОКА
-    "4,4": 'Врановые',           // ГАЛКА
-    "4,7": 'Синяя птичка',       // СИНИЦА
-    "4,9": 'Стучит по дереву',   // ДЯТЕЛ
-    "6,0": 'Даёт молоко',        // КОЗА
-    "6,2": 'Даёт шерсть',        // БАРАН
-    "6,4": 'Даёт сало',          // СВИНЬЯ
-    "6,7": 'Даёт мясо',          // КОРОВА
-    "6,9": 'Друг человека',      // СОБАКА
-    "8,0": 'Маленький серый',    // МЫШЬ
-    "8,2": 'С длинным хвостом',  // КРЫСА
-    "8,5": 'Колючий',            // ЁЖ
-    "8,8": 'Хитрая',             // ЛИС
+    "0,0": 'Домашний любимец',
+    "0,4": 'Ночная птица',
+    "0,8": 'Согласие',
+    "1,0": 'Огромный с хоботом',
+    "2,0": 'Полосатый хищник',
+    "2,2": 'Длинноухий',
+    "2,5": 'Косолапый',
+    "2,7": 'Полоскун',
+    "4,0": 'Чёрная птица',
+    "4,2": 'Белая болтушка',
+    "4,4": 'Врановые',
+    "4,7": 'Синяя птичка',
+    "4,9": 'Стучит по дереву',
+    "6,0": 'Даёт молоко',
+    "6,2": 'Даёт шерсть',
+    "6,4": 'Даёт сало',
+    "6,7": 'Даёт мясо',
+    "6,9": 'Друг человека',
+    "8,0": 'Маленький серый',
+    "8,2": 'С длинным хвостом',
+    "8,5": 'Колючий',
+    "8,8": 'Хитрая',
 };
 
 // ================================================================
-//  АВТОМАТИЧЕСКИЙ СБОР СЛОВ ИЗ СЕТКИ
+//  АВТОМАТИЧЕСКИЙ СБОР СЛОВ С УКАЗАНИЕМ НАПРАВЛЕНИЯ
 // ================================================================
 
 function buildWordsFromGrid(grid) {
@@ -58,7 +53,7 @@ function buildWordsFromGrid(grid) {
     const words = { h: {}, v: {} };
     let wordId = 1;
 
-    // Горизонтальные слова
+    // Горизонтальные (→)
     for (let r = 0; r < rows; r++) {
         let c = 0;
         while (c < cols) {
@@ -75,7 +70,7 @@ function buildWordsFromGrid(grid) {
                         col: start,
                         length: word.length,
                         answer: word,
-                        letters: word.split('')
+                        dir: '→',
                     };
                     wordId++;
                 }
@@ -85,7 +80,7 @@ function buildWordsFromGrid(grid) {
         }
     }
 
-    // Вертикальные слова
+    // Вертикальные (↓)
     for (let c = 0; c < cols; c++) {
         let r = 0;
         while (r < rows) {
@@ -102,7 +97,7 @@ function buildWordsFromGrid(grid) {
                         col: c,
                         length: word.length,
                         answer: word,
-                        letters: word.split('')
+                        dir: '↓',
                     };
                     wordId++;
                 }
@@ -403,19 +398,28 @@ function giveHint() {
 
 function renderGrid() {
     gridContainer.innerHTML = '';
-    gridContainer.style.gridTemplateColumns = `repeat(${cols}, 52px)`;
-    gridContainer.style.gridTemplateRows = `repeat(${rows}, 52px)`;
+    const size = getCellSize();
+    gridContainer.style.gridTemplateColumns = `repeat(${cols}, ${size}px)`;
+    gridContainer.style.gridTemplateRows = `repeat(${rows}, ${size}px)`;
 
-    // Собираем все стартовые позиции слов
-    const wordStarts = {};
+    // Собираем информацию о направлениях для каждой клетки
+    const directions = {};
+    const wordIds = {};
+
     for (const [id, data] of Object.entries(words.h)) {
         const key = `${data.row},${data.col}`;
-        wordStarts[key] = id;
+        wordIds[key] = id;
+        directions[key] = '→';
     }
     for (const [id, data] of Object.entries(words.v)) {
         const key = `${data.row},${data.col}`;
-        if (!wordStarts[key]) {
-            wordStarts[key] = id;
+        if (!wordIds[key]) {
+            wordIds[key] = id;
+            directions[key] = '↓';
+        }
+        // Если есть и горизонтальное, и вертикальное — показываем оба
+        if (wordIds[key]) {
+            // Уже есть горизонтальное — добавляем вертикальное как дополнительное
         }
     }
 
@@ -431,18 +435,22 @@ function renderGrid() {
             if (letter === 0) {
                 cell.classList.add('black');
             } else {
-                // Проверяем, начинается ли здесь слово
                 const key = `${r},${c}`;
-                const wordId = wordStarts[key];
+                const wordId = wordIds[key];
+                const dir = directions[key] || '';
 
                 if (wordId) {
-                    // Номер слова
+                    // Номер + стрелка
                     const numSpan = document.createElement('span');
                     numSpan.className = 'number';
-                    numSpan.textContent = wordId;
+                    const arrowSpan = document.createElement('span');
+                    arrowSpan.className = 'arrow';
+                    arrowSpan.textContent = dir;
+                    numSpan.appendChild(arrowSpan);
+                    numSpan.insertAdjacentText('beforeend', wordId);
                     cell.appendChild(numSpan);
 
-                    // Вопрос (если есть)
+                    // Вопрос
                     const questionText = questions[key] || '';
                     if (questionText) {
                         const qSpan = document.createElement('span');
@@ -490,7 +498,6 @@ function renderGrid() {
                         }
                     }
 
-                    // Автопереход на следующую клетку
                     if (val.trim() !== '') {
                         moveToNextCell(r, c);
                     }
@@ -513,17 +520,17 @@ function renderGrid() {
             gridContainer.appendChild(cell);
         }
     }
+}
 
-    // Адаптивные размеры
-    updateSizes();
+function getCellSize() {
+    const width = window.innerWidth;
+    if (width < 450) return 34;
+    if (width < 700) return 44;
+    return 56;
 }
 
 function updateSizes() {
-    const width = window.innerWidth;
-    let size = 52;
-    if (width < 450) size = 30;
-    else if (width < 700) size = 38;
-
+    const size = getCellSize();
     gridContainer.style.gridTemplateColumns = `repeat(${cols}, ${size}px)`;
     gridContainer.style.gridTemplateRows = `repeat(${rows}, ${size}px)`;
 
