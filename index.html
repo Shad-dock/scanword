@@ -3,18 +3,16 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>🧩 Сканворд</title>
+    <title>🐾 Сканворд: Животные</title>
     <link rel="stylesheet" href="style.css" />
 </head>
 <body>
     <div class="container">
-        <h1>🧩 Сканворд</h1>
-        <p class="subtitle">Впиши буквы в клетки. Ответы на вопросы — внизу</p>
+        <h1>🐾 Сканворд: Животные</h1>
+        <p class="subtitle">Нажми на вопрос — подсветятся нужные клетки</p>
 
-        <!-- Сетка -->
         <div id="crossword-grid"></div>
 
-        <!-- Вопросы -->
         <div id="clues-container">
             <div class="clue-section">
                 <h3>➡ По горизонтали</h3>
@@ -26,14 +24,12 @@
             </div>
         </div>
 
-        <!-- Кнопки -->
         <div class="buttons">
-            <button id="checkBtn">✅ Проверить</button>
+            <button id="checkBtn">✅ Проверить всё</button>
             <button id="resetBtn">🔄 Очистить</button>
             <button id="hintBtn">💡 Подсказка</button>
         </div>
 
-        <!-- Статус -->
         <div id="message"></div>
         <div id="score">🎯 Отгадано: <span id="correctCount">0</span> из <span id="totalCount">0</span></div>
     </div>
